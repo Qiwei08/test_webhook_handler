@@ -1,0 +1,4 @@
+saagieapi==2.6.1
+dash-bootstrap-components==1.4.1
+pandas==2.0.3
+urllib3==1.26.15

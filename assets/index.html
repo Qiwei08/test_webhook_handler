@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f1f1f1;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 36px;
+      color: #333333;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #eeeeee;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    }
+
+    .card h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #333333;
+    }
+
+    .card p {
+      font-size: 18px;
+      margin: 0;
+      color: #333333;
+    }
+
+    .card-date {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #999999;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 20px;
+    }
+
+    strong {
+      font-weight: bold;
+    }
+	.timestamp {
+      font-weight: normal;
+    }
+
+	.json-card {
+		background-color: #eeeeee;
+		padding: 20px;
+		margin-bottom: 20px;
+		border-radius: 5px;
+		box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+		white-space: pre;
+		font-family: 'Courier New', Courier, monospace;
+		font-size: 16px;
+		color: #333333;
+	}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Saipem - ESRI payloads APP</h1>
+  
+    <p>Recent payloads:</p>
+    <ul>
+      {% for payload in payload_history %}
+      <li>
+        <div class="card">
+		  <span class="timestamp">{{ payload.current_date }}</span>
+          <span class="card-date">{{ payload.date }}</span>
+          <h2>Payload ID: {{ payload.id }}</h2>
+          <p><strong>Type:</strong> {{ payload.type }}</p>
+          <p><strong>Geometry Type:</strong> {{ payload.geometryType }}</p>
+          <p><strong>Geometry:</strong> {{ payload.geometry }}</p>
+          <p><strong>Properties:</strong></p>
+		  <div class="json-card">{{ payload.properties|tojson(indent=2) }}</div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</body>
+</html>
