@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 from flask import Flask, request, render_template
 from saagieapi import SaagieApi
 from datetime import datetime
-
+import flask
 
 # conf
 text_color = '#263D5C'
@@ -15,10 +15,16 @@ border_color = "#D9DBE3"
 border_radius = 6
 btn_style = {"height": 40, "width": 100, "border-radius": border_radius}
 
+server = flask.Flask(__name__)
+app = dash.Dash(__name__,
+                server=server,
+                external_stylesheets=[dbc.themes.BOOTSTRAP],
+                routes_pathname_prefix='/dash/',
+                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/")
+
 project_name = os.getenv("SAAGIE_PROJECT_NAME")
 pipeline_name = os.getenv("SAAGIE_PIPELINE_NAME")
-
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/")
+payload_history = []
 
 saagie_client = SaagieApi(url_saagie=os.environ["SAAGIE_URL"],
                           id_platform=os.environ["SAAGIE_PLATFORM_ID"],
@@ -26,15 +32,8 @@ saagie_client = SaagieApi(url_saagie=os.environ["SAAGIE_URL"],
                           password=os.environ["SAAGIE_PWD"],
                           realm=os.environ["SAAGIE_REALM"])
 
-pipeline_id = saagie_client.pipelines.get_id(
-    project_name=project_name,
-    pipeline_name=pipeline_name
-)
 
-payload_history = []
-
-
-@app.server.route('/', methods=['GET', 'POST'])
+@server.route('/', methods=['GET', 'POST'])
 def receive_webhook():
     if request.method == 'POST':
         payload = request.get_json()
@@ -42,7 +41,8 @@ def receive_webhook():
         feature_attributes = esri_dict["attributes"]
         feature_geometry = esri_dict["geometry"]
         print("Attributes")
-        print("a quel heure vous l'avez vu:", datetime.fromtimestamp(feature_attributes["a_quel_heure_vous_lavez_vu"]/1000))
+        print("a quel heure vous l'avez vu:",
+              datetime.fromtimestamp(feature_attributes["a_quel_heure_vous_lavez_vu"] / 1000))
         print("quel tete:", feature_attributes["quel_tete"])
         print("Genance:", feature_attributes["g_ne_g_n_rer"])
         print("utilite de ce survey:", feature_attributes["utilit_de_ce_survey"])
@@ -71,7 +71,8 @@ app.layout = dbc.Container(fluid=True, children=[
                     dbc.Row(
                         [
                             dbc.Col(html.Img(src="assets/saipem_logo.png", height="50px")),
-                            dbc.Col(dbc.NavbarBrand("Saipem - ESRI payloads APP", className="ms-3", style={"color": text_color})),
+                            dbc.Col(dbc.NavbarBrand("Saipem - ESRI payloads APP", className="ms-3",
+                                                    style={"color": text_color})),
                         ],
                         align="center",
                         className="g-0",
@@ -104,7 +105,8 @@ app.layout = dbc.Container(fluid=True, children=[
                     dbc.Card([
                         dbc.CardHeader(f"Object ID: {i['attributes']['objectid']}"),
                         dbc.CardBody([
-                            dbc.Row(f"A quel heure vous l'avez vu: {datetime.fromtimestamp(i['attributes']['a_quel_heure_vous_lavez_vu']/1000)}"),
+                            dbc.Row(
+                                f"A quel heure vous l'avez vu: {datetime.fromtimestamp(i['attributes']['a_quel_heure_vous_lavez_vu'] / 1000)}"),
                             dbc.Row(f"Quel tete: {i['attributes']['quel_tete']}"),
                             dbc.Row(f"Genance: {i['attributes']['g_ne_g_n_rer']}"),
                             dbc.Row(f"Utilite de ce survey: {i['attributes']['utilit_de_ce_survey']}"),
@@ -119,7 +121,6 @@ app.layout = dbc.Container(fluid=True, children=[
     ),
 
 ])
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
