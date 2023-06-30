@@ -3,6 +3,7 @@ import dash
 from dash import html
 import dash_bootstrap_components as dbc
 from flask import Flask, request, render_template
+from dash.dependencies import Input, Output, State
 from saagieapi import SaagieApi
 from datetime import datetime
 import flask
@@ -19,7 +20,7 @@ server = flask.Flask(__name__)
 app = dash.Dash(__name__,
                 server=server,
                 external_stylesheets=[dbc.themes.BOOTSTRAP],
-                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/")
+                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] )
 
 project_name = os.getenv("SAAGIE_PROJECT_NAME")
 pipeline_name = os.getenv("SAAGIE_PIPELINE_NAME")
@@ -31,8 +32,13 @@ saagie_client = SaagieApi(url_saagie=os.environ["SAAGIE_URL"],
                           password=os.environ["SAAGIE_PWD"],
                           realm=os.environ["SAAGIE_REALM"])
 
+pipeline_id = saagie_client.pipelines.get_id(
+    project_name=project_name,
+    pipeline_name=pipeline_name
+)
 
-@server.route('/', methods=['GET', 'POST'])
+
+@server.route('/app', methods=['GET', 'POST'])
 def receive_webhook():
     if request.method == 'POST':
         payload = request.get_json()
@@ -59,6 +65,29 @@ def receive_webhook():
     else:
         return payload_history
         # return render_template('./assets/index.html', payload_history=payload_history)
+
+
+@app.callback(Output(component_id='my-list', component_property='children'),
+              [Input(component_id='refresh', component_property='n_clicks'), ])
+def populate_datatable(refresh):
+    return [
+        html.Li(children=[
+            dbc.Card([
+                dbc.CardHeader(f"Object ID: {i['attributes']['objectid']}"),
+                dbc.CardBody([
+                    dbc.Row(
+                        f"A quel heure vous l'avez vu: {datetime.fromtimestamp(i['attributes']['a_quel_heure_vous_lavez_vu'] / 1000)}"),
+                    dbc.Row(f"Quel tete: {i['attributes']['quel_tete']}"),
+                    dbc.Row(f"Genance: {i['attributes']['g_ne_g_n_rer']}"),
+                    dbc.Row(f"Utilite de ce survey: {i['attributes']['utilit_de_ce_survey']}"),
+                    dbc.Row(f"Geometry: {i['geometry']}"),
+
+                ]),
+            ],
+            ),
+            dbc.Row(html.Br(), class_name=".mb-4"),
+        ]
+        ) for i in payload_history]
 
 
 app.layout = dbc.Container(fluid=True, children=[
@@ -94,28 +123,13 @@ app.layout = dbc.Container(fluid=True, children=[
     dbc.Row(html.Br(), class_name=".mb-4"),
 
     # Main part
-    dbc.Row("Recent payloads:"),
+    dbc.Row("Recent payloads:", style={"margin-left": "10px", 'font-weight': 'bold'}, className="ms-3"),
+    dbc.Row(html.Br(), class_name=".mb-4"),
     dbc.Row(
         className="payload",
         children=[
 
-            html.Ul(id='my-list', children=[
-                html.Li(children=[
-                    dbc.Card([
-                        dbc.CardHeader(f"Object ID: {i['attributes']['objectid']}"),
-                        dbc.CardBody([
-                            dbc.Row(
-                                f"A quel heure vous l'avez vu: {datetime.fromtimestamp(i['attributes']['a_quel_heure_vous_lavez_vu'] / 1000)}"),
-                            dbc.Row(f"Quel tete: {i['attributes']['quel_tete']}"),
-                            dbc.Row(f"Genance: {i['attributes']['g_ne_g_n_rer']}"),
-                            dbc.Row(f"Utilite de ce survey: {i['attributes']['utilit_de_ce_survey']}"),
-                            dbc.Row(f"Geometry: {i['geometry']}"),
-
-                        ]),
-                    ],
-                    ),
-                ]
-                ) for i in payload_history])
+            html.Ul(id='my-list', style={"margin-left": "10px"})
         ],
     ),
 
