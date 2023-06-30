@@ -20,7 +20,7 @@ server = flask.Flask(__name__)
 app = dash.Dash(__name__,
                 server=server,
                 external_stylesheets=[dbc.themes.BOOTSTRAP],
-                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] )
+                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/" )
 
 project_name = os.getenv("SAAGIE_PROJECT_NAME")
 pipeline_name = os.getenv("SAAGIE_PIPELINE_NAME")
