@@ -62,7 +62,7 @@ def receive_webhook():
         saagie_client.pipelines.run_with_callback(pipeline_id=pipeline_id)
         return 'Webhook received successfully'
     else:
-        return app.index
+        return app.index()
 
 
 @app.callback(Output(component_id='my-list', component_property='children'),
