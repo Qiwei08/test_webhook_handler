@@ -60,7 +60,7 @@ def receive_webhook():
         payload['current_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         payload_history.append(esri_dict)  # Add the payload to the history list
         saagie_client.pipelines.run_with_callback(pipeline_id=pipeline_id)
-        return 'Webhook received successfully'
+        return app.index()
     else:
         return app.index()
 
