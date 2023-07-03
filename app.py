@@ -37,7 +37,7 @@ pipeline_id = saagie_client.pipelines.get_id(
 )
 
 
-@server.route(f"{os.environ['SAAGIE_BASE_PATH']}/app", methods=['GET', 'POST'])
+@server.route(f"{os.environ['SAAGIE_BASE_PATH']}/", methods=['GET', 'POST'])
 def receive_webhook():
     if request.method == 'POST':
         payload = request.get_json()
