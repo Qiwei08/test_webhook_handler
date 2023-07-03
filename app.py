@@ -16,11 +16,10 @@ border_color = "#D9DBE3"
 border_radius = 6
 btn_style = {"height": 40, "width": 100, "border-radius": border_radius}
 
-server = flask.Flask(__name__)
 app = dash.Dash(__name__,
-                server=server,
                 external_stylesheets=[dbc.themes.BOOTSTRAP],
-                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/" )
+                url_base_pathname=os.environ["SAAGIE_BASE_PATH"] + "/")
+server = app.server
 
 project_name = os.getenv("SAAGIE_PROJECT_NAME")
 pipeline_name = os.getenv("SAAGIE_PIPELINE_NAME")
@@ -38,7 +37,7 @@ pipeline_id = saagie_client.pipelines.get_id(
 )
 
 
-@server.route('/app', methods=['GET', 'POST'])
+@server.route(f"{os.environ['SAAGIE_BASE_PATH']}/app", methods=['GET', 'POST'])
 def receive_webhook():
     if request.method == 'POST':
         payload = request.get_json()
@@ -63,8 +62,7 @@ def receive_webhook():
         saagie_client.pipelines.run_with_callback(pipeline_id=pipeline_id)
         return 'Webhook received successfully'
     else:
-        return payload_history
-        # return render_template('./assets/index.html', payload_history=payload_history)
+        return app.index
 
 
 @app.callback(Output(component_id='my-list', component_property='children'),
@@ -108,7 +106,7 @@ app.layout = dbc.Container(fluid=True, children=[
                     href="https://www.saipem.fr/",
                     style={"textDecoration": "none", "margin-left": "0px"},
                 ),
-                dbc.Button("⟳ Refresh", id="refresh", n_clicks=0, size='mb', href='/',
+                dbc.Button("⟳ Refresh", id="refresh", n_clicks=0, size='mb', href=os.environ["SAAGIE_BASE_PATH"] + "/",
                            color="dark",
                            outline=True,
                            style={"height": "1%", "font-size": 14, "width": "10",
