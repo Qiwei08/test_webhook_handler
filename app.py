@@ -41,6 +41,7 @@ pipeline_id = saagie_client.pipelines.get_id(
 def receive_webhook():
     if request.method == 'POST':
         payload = request.get_json()
+        print(f"Payload: \n{payload}")
         esri_dict = payload["feature"]
         feature_attributes = esri_dict["attributes"]
         feature_geometry = esri_dict["geometry"]
