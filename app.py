@@ -60,7 +60,7 @@ def receive_webhook():
         print("geometry spatialReference:", feature_geometry["spatialReference"])
         payload['current_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         payload_history.append(esri_dict)  # Add the payload to the history list
-        saagie_client.pipelines.run_with_callback(pipeline_id=pipeline_id)
+        saagie_client.pipelines.run(pipeline_id=pipeline_id)
         return app.index()
     else:
         return app.index()
@@ -135,4 +135,4 @@ app.layout = dbc.Container(fluid=True, children=[
 ])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=True, port=80)
