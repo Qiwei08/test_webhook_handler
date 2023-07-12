@@ -6,7 +6,6 @@ from flask import Flask, request, render_template
 from dash.dependencies import Input, Output, State
 from saagieapi import SaagieApi
 from datetime import datetime
-import flask
 
 # conf
 text_color = '#263D5C'
@@ -135,4 +134,4 @@ app.layout = dbc.Container(fluid=True, children=[
 ])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True, port=80)
+    app.run(host='0.0.0.0', debug=True)
